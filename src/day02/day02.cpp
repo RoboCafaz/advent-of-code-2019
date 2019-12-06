@@ -4,12 +4,14 @@
 #include <string>
 #include <vector>
 
+const uint32_t SEEK = 19690720;
 const char *FILE_PATH =
     "/Users/robert.cafazzo/personal_dev/advent-of-code-2019/data/day02_input";
 
-void loadNumbers(std::vector<uint32_t> &numbers) {
+std::vector<uint32_t> loadNumbers() {
   std::ifstream file(FILE_PATH);
 
+  std::vector<uint32_t> numbers;
   if (file.is_open()) {
     std::string str;
     while (std::getline(file, str, ',')) {
@@ -18,6 +20,7 @@ void loadNumbers(std::vector<uint32_t> &numbers) {
   } else {
     throw "Failed to open file.";
   }
+  return numbers;
 }
 
 void performOpCode(std::vector<uint32_t> &numbers, uint32_t index,
@@ -51,21 +54,36 @@ uint32_t performOpCode(uint32_t opCode, std::vector<uint32_t> &numbers,
   }
 }
 
-int main() {
-  std::vector<uint32_t> numbers;
-  loadNumbers(numbers);
-
-  // This instruction was pretty stupid.
-  numbers[1] = 12;
-  numbers[2] = 2;
-
+// numbers is passed by value so the default number set won't be overridden
+std::vector<uint32_t> evaluate(uint32_t noun, uint32_t verb,
+                               std::vector<uint32_t> numbers) {
+  numbers[1] = noun;
+  numbers[2] = verb;
   uint32_t index = 0;
   while (index < numbers.size()) {
     index = performOpCode(numbers[index], numbers, index);
   }
+  return numbers;
+}
+
+int main() {
+  std::vector<uint32_t> input = loadNumbers();
+
+  std::vector<uint32_t> results{0};
+  uint32_t noun = 0;
+  uint32_t verb = 0;
+
+  while (noun < 99 && results[0] != SEEK) {
+    while (verb < 99 && results[0] != SEEK) {
+      results = evaluate(noun, verb, input);
+      verb++;
+    }
+    verb = 0;
+    noun++;
+  }
 
   bool first = true;
-  for (auto number : numbers) {
+  for (auto number : results) {
     if (!first) {
       std::cout << ",";
     }
