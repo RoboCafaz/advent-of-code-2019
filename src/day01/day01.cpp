@@ -26,6 +26,7 @@ uint32_t calculateFuelReq(uint32_t mass) {
   auto req = (mass / 3);
   if (req > 2) {
     req -= 2;
+    req += calculateFuelReq(req);
   } else {
     req = 0;
   }
